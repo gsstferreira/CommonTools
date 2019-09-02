@@ -17,7 +17,7 @@ HttpClient ->
 - **HttpClient**(boolean *useCache*, boolean *proxy*, boolean *secure*, int *requestTimeout*, int *responseTimeout*)
 - **HttpResponse** sendGetRequest(String *url*, List<Header> *headers*)
 - **HttpResponse** sendPostRequest(String *url*, List<Header> *headers*, byte[] *data*)
-- **HttpResponse** sendPutrequest(String *url*, List<Header> *headers*, byte[] *data*)
+- **HttpResponse** sendPutRequest(String *url*, List<Header> *headers*, byte[] *data*)
 - **HttpResponse** sendDeleteRequest(String *url*, List<Header> *headers*)
 
 
