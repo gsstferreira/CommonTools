@@ -1,0 +1,15 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Base64Tool">
+    <output-path>$PROJECT_DIR$/out/artifacts/Base64Tool</output-path>
+    <root id="archive" name="Base64Tool.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="directory" name="Base64Tools">
+        <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/Base64Tools/Base64Tool.class" />
+        <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/Base64Tools/Methods.class" />
+        <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/Base64Tools/Values.class" />
+      </element>
+    </root>
+  </artifact>
+</component>
