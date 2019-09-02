@@ -1,6 +1,9 @@
 package Main;
 
 import Base64Tools.*;
+import HttpTools.HttpClient;
+import HttpTools.HttpResponse;
+import HttpTools.HttpResponseSecure;
 
 import java.io.IOException;
 
@@ -18,5 +21,9 @@ public class Main {
 
         System.out.println();
         System.out.println(custom_decoded);
+
+        HttpClient client = new HttpClient(false,false,false,3000,3000);
+
+        HttpResponse a = client.sendGetRequest("a",null);
     }
 }

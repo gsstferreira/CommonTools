@@ -172,7 +172,7 @@ public class HttpClient {
     }
 
     //Secure request without data
-    private HttpResponse httpRequestSecure(URL url, List<Header> headers, String method) throws IOException {
+    private HttpResponseSecure httpRequestSecure(URL url, List<Header> headers, String method) throws IOException {
 
         BufferedReader streamReader;
 
@@ -197,17 +197,18 @@ public class HttpClient {
             sb.append(currentLine).append("\n");
         }
 
+        HttpResponseSecure respSec = new HttpResponseSecure(responseHeaders,httpResponseCode,sb.toString().trim(),connection);
         connection.disconnect();
         try {
             Objects.requireNonNull(streamReader).close();
         }
         catch (IOException ignored){ }
 
-        return new HttpResponse(responseHeaders,httpResponseCode,sb.toString().trim());
+        return respSec;
     }
 
     //Secure request with data
-    private HttpResponse httpRequestSecure(URL url, List<Header> headers, String method, byte[] data) throws IOException {
+    private HttpResponseSecure httpRequestSecure(URL url, List<Header> headers, String method, byte[] data) throws IOException {
 
         BufferedReader streamReader;
 
@@ -237,13 +238,14 @@ public class HttpClient {
             sb.append(currentLine).append("\n");
         }
 
+        HttpResponseSecure respSec = new HttpResponseSecure(responseHeaders,httpResponseCode,sb.toString().trim(),connection);
         connection.disconnect();
         try {
             Objects.requireNonNull(streamReader).close();
         }
         catch (IOException ignored){ }
 
-        return new HttpResponse(responseHeaders,httpResponseCode,sb.toString().trim());
+        return respSec;
     }
 
     private HttpURLConnection setupConnection(URL url, List<Header> headers, String method) throws IOException {

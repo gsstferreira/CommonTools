@@ -9,6 +9,7 @@
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/Header.class" />
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/HttpClient.class" />
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/HttpResponse.class" />
+        <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/HttpResponseSecure.class" />
       </element>
     </root>
   </artifact>

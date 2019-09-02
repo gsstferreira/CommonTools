@@ -4,9 +4,9 @@ import java.util.List;
 
 public class HttpResponse {
 
-    private final List<Header> headers;
-    private final int responseCode;
-    private final byte[] content;
+    protected final List<Header> headers;
+    protected final int responseCode;
+    protected final byte[] content;
 
     HttpResponse(List<Header> headers, int httpCode, String content) {
         this.headers = headers;
