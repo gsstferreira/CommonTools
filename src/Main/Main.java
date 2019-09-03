@@ -1,29 +1,41 @@
 package Main;
 
-import Base64Tools.*;
-import HttpTools.HttpClient;
-import HttpTools.HttpResponse;
-import HttpTools.HttpResponseSecure;
-
-import java.io.IOException;
+import java.io.*;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        String helloW = "Hello World in Katz Korner!///////////////////////////////???????????????????????\\\\\\\\\\\\\\\\";
-        byte[] bytes = helloW.getBytes();
-        String b64_custom = Base64Tool.encodeBytes(bytes,true);
+        String dir = "C:/Users/gusta/Downloads/earth.bmp";
+        String dir2 = "C:/Users/gusta/Downloads/earth2.bmp";
 
-        System.out.println(b64_custom);
+        File f = new File(dir);
+        File f2 = new File(dir2);
 
-        String custom_decoded = new String(Base64Tool.decodeBytes(b64_custom.getBytes(),true));
+        byte[] image = new BufferedInputStream(new FileInputStream(f)).readAllBytes();
+        byte[] image2 = new BufferedInputStream(new FileInputStream(f2)).readAllBytes();
 
-        System.out.println();
-        System.out.println(custom_decoded);
+//        String s1 = Base64.getEncoder().encodeToString(image).trim();
+//        String s2 = Base64Tool.encodeBytes(image,false);
+//
+//        System.out.println(s1.length() == s2.length());
+//        System.out.println(s1.equals(s2));
+//
+//        for(int i = 0; i < s1.length(); i++) {
+//
+//            char c1 = s1.charAt(i);
+//            char c2 = s2.charAt(i);
+//
+//            if(c1 != c2) {
+//                System.out.println(String.format("Mismatch at position %08d: '%c' should be '%c'",i,c2,c1));
+//            }
+//        }
+//
+//        FileOutputStream outputStream = new FileOutputStream(new File("C:/Users/gusta/Downloads/earth_mesh.bmp"));
+//
+//        outputStream.write(diff_mesh);
+//        outputStream.flush();
+//        outputStream.close();
 
-        HttpClient client = new HttpClient(false,false,false,3000,3000);
-
-        HttpResponse a = client.sendGetRequest("a",null);
     }
 }

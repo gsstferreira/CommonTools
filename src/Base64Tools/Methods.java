@@ -7,53 +7,34 @@ abstract class Methods {
 
     static String encodeBytes(byte[] bytes) {
 
-        int len = bytes.length;
-
+        final int len = bytes.length;
         final int outLen = (len/3 + (len%3 == 0 ? 0 : 1)) * 4;
-
-        byte[] outputBytes = new byte[outLen];
+        final byte[] outputBytes = new byte[outLen];
 
         int i = 0;
         int j = 0;
 
-        int[] chs = new int[4];
-
-        while(len - i > 2) {
-
-            chs[0] = bytes[i] >> 2;
-            chs[1] = (bytes[i] << 4) + (bytes[i+1] >> 4);
-            chs[2] = (bytes[i+1] << 2) + (bytes[i +2] >> 6);
-            chs[3] = bytes[i+2];
-
-            outputBytes[j] = valueToChar(chs[0]);
-            outputBytes[j+1] = valueToChar(chs[1]);
-            outputBytes[j+2] = valueToChar(chs[2]);
-            outputBytes[j+3] = valueToChar(chs[3]);
-
-            i+=3;
-            j+=4;
+        while(i < len - 2) {
+            outputBytes[j++] = valueToChar((bytes[i] >>> 2) & 0x3F);
+            outputBytes[j++] = valueToChar(((bytes[i++] << 4) & 0x30) + ((bytes[i] >>> 4) & 0x0F));
+            outputBytes[j++] = valueToChar(((bytes[i++] << 2) & 0x3C) + ((bytes[i] >>> 6) & 0x03));
+            outputBytes[j++] = valueToChar(bytes[i++] & 0x3F);
         }
 
         switch (len - i) {
             case 0:
                 break;
             case 1:
-                chs[0] = (bytes[i] >> 2);
-                chs[1] = (bytes[i] << 4);
-                outputBytes[j] = valueToChar(chs[0]);
-                outputBytes[j+1] = valueToChar(chs[1]);
-                outputBytes[j+2] = valueToChar(64);
-                outputBytes[j+3] = valueToChar(64);
+                outputBytes[j++] = valueToChar((bytes[i] >>> 2) & 0x3F);
+                outputBytes[j++] = valueToChar((bytes[i] << 4) & 0x30);
+                outputBytes[j++] = valueToChar(64);
+                outputBytes[j] = valueToChar(64);
                 break;
             case 2:
-                chs[0] = (bytes[i] >> 2);
-                chs[1] = ((bytes[i] << 4) + (bytes[i+1] >> 4));
-                chs[2] = (bytes[i+1] << 2);
-
-                outputBytes[j] = valueToChar(chs[0]);
-                outputBytes[j+1] = valueToChar(chs[1]);
-                outputBytes[j+2] = valueToChar(chs[2]);
-                outputBytes[j+3] = valueToChar(64);
+                outputBytes[j++] = valueToChar((bytes[i] >>> 2) & 0x3F);
+                outputBytes[j++] = valueToChar(((bytes[i++] << 4) & 0x30) + ((bytes[i] >>> 4) & 0x0F));
+                outputBytes[j++] = valueToChar((bytes[i] << 2) & 0x3C);
+                outputBytes[j] = valueToChar(64);
                 break;
         }
         return new String(outputBytes);
@@ -62,49 +43,30 @@ abstract class Methods {
     static String encodeBytes_UrlEncoding(byte[] bytes) {
 
         StringBuilder sb = new StringBuilder();
-
-        int len = bytes.length;
-
+        final int len = bytes.length;
         int i = 0;
 
-        int[] chs = new int[4];
-
-        while(len - i > 2) {
-
-            chs[0] = (bytes[i] >> 2) & 0b00111111;
-            chs[1] = ((bytes[i] << 4) + (bytes[i+1] >> 4)) & 0b00111111;
-            chs[2] = ((bytes[i+1] << 2) + (bytes[i +2] >> 6)) & 0b00111111;
-            chs[3] = bytes[i+2] & 0b00111111;
-
-            sb.append(Values.encoderDictionaryURL[chs[0]]);
-            sb.append(Values.encoderDictionaryURL[chs[1]]);
-            sb.append(Values.encoderDictionaryURL[chs[2]]);
-            sb.append(Values.encoderDictionaryURL[chs[3]]);
-
-            i+=3;
+        while(i < len - 2) {
+            sb.append(Values.encoderDictionaryURL[(bytes[i] >>> 2) & 0x3F]);
+            sb.append(Values.encoderDictionaryURL[((bytes[i++] << 4) & 0x30) + ((bytes[i] >>> 4) & 0x0F)]);
+            sb.append(Values.encoderDictionaryURL[((bytes[i++] << 2) & 0x3C) + ((bytes[i] >>> 6) & 0x03)]);
+            sb.append(Values.encoderDictionaryURL[bytes[i++] & 0x3F]);
         }
 
         switch (len - i) {
             case 0:
                 break;
             case 1:
-                chs[0] = (bytes[i] >> 2) & 0b00111111;
-                chs[1] = (bytes[i] << 4) & 0b00111111;
-                sb.append(Values.encoderDictionaryURL[chs[0]]);
-                sb.append(Values.encoderDictionaryURL[chs[1]]);
+                sb.append(Values.encoderDictionaryURL[(bytes[i] >>> 2) & 0x3F]);
+                sb.append(Values.encoderDictionaryURL[((bytes[i] << 4) & 0x30)]);
                 sb.append(Values.encoderDictionaryURL[64]);
                 sb.append(Values.encoderDictionaryURL[64]);
-
                 break;
             case 2:
-                chs[0] = (bytes[i] >> 2) & 0b00111111;
-                chs[1] = ((bytes[i] << 4) + (bytes[i+1] >> 4)) & 0b00111111;
-                chs[2] = (bytes[i+1] << 2) & 0b00111111;
-                sb.append(Values.encoderDictionaryURL[chs[0]]);
-                sb.append(Values.encoderDictionaryURL[chs[1]]);
-                sb.append(Values.encoderDictionaryURL[chs[2]]);
+                sb.append(Values.encoderDictionaryURL[(bytes[i] >>> 2) & 0x3F]);
+                sb.append(Values.encoderDictionaryURL[((bytes[i++] << 4) & 0x30) + ((bytes[i] >>> 4) & 0x0F)]);
+                sb.append(Values.encoderDictionaryURL[((bytes[i] << 2) & 0x3C)]);
                 sb.append(Values.encoderDictionaryURL[64]);
-
                 break;
         }
         return sb.toString();
@@ -251,7 +213,7 @@ abstract class Methods {
 
     private static byte valueToChar(int value) {
 
-        return Values.encoderDictionary[value & 0b00111111];
+        return Values.encoderDictionary[value];
     }
 
     private static byte charToValue(int c) throws IOException {
