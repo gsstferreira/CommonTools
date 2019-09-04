@@ -22,21 +22,12 @@ public abstract class Base64Tool {
         }
     }
 
-    public static String encodeChars(char[] chars, boolean isUrlEncoded) {
-        if(isUrlEncoded) {
-            return Methods.encodeBytes_UrlEncoding(chars.toString().getBytes());
-        }
-        else {
-            return Methods.encodeChars(chars);
-        }
-    }
-
     public static byte[] decodeString(String b64String, boolean isUrlEncoded) throws IOException {
         if(isUrlEncoded) {
-            return Methods.decodeBytes_UrlEncoding(b64String.getBytes());
+            return Methods.decodeString_UrlEncoding(b64String);
         }
         else {
-            return Methods.decodeBytes(b64String.getBytes());
+            return Methods.decodeString(b64String);
         }
     }
 

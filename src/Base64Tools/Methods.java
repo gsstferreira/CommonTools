@@ -1,6 +1,7 @@
 package Base64Tools;
 
 import java.io.IOException;
+
 import static AssertTools.Assert.*;
 
 abstract class Methods {
@@ -40,41 +41,6 @@ abstract class Methods {
         return new String(chars);
     }
 
-    static String encodeChars(char[] chs) {
-
-        final int len = chs.length;
-        final int outLen = (len/3 + (len%3 == 0 ? 0 : 1)) * 4;
-        final char[] chars = new char[outLen];
-
-        int i = 0;
-        int j = 0;
-
-        while(i < len - 2) {
-            chars[j++] = valueToChar((chs[i] >>> 2) & 0x003F);
-            chars[j++] = valueToChar(((chs[i++] << 4) & 0x0030) + ((chs[i] >>> 4) & 0x000F));
-            chars[j++] = valueToChar(((chs[i++] << 2) & 0x003C) + ((chs[i] >>> 6) & 0x0003));
-            chars[j++] = valueToChar(chs[i++] & 0x003F);
-        }
-
-        switch (len - i) {
-            case 0:
-                break;
-            case 1:
-                chars[j++] = valueToChar((chs[i] >>> 2) & 0x003F);
-                chars[j++] = valueToChar((chs[i] << 4) & 0x0030);
-                chars[j++] = valueToChar(64);
-                chars[j] = valueToChar(64);
-                break;
-            case 2:
-                chars[j++] = valueToChar((chs[i] >>> 2) & 0x003F);
-                chars[j++] = valueToChar(((chs[i++] << 4) & 0x0030) + ((chs[i] >>> 4) & 0x000F));
-                chars[j++] = valueToChar((chs[i] << 2) & 0x003C);
-                chars[j] = valueToChar(64);
-                break;
-        }
-        return new String(chars);
-    }
-
     static String encodeBytes_UrlEncoding(byte[] bytes) {
 
         StringBuilder sb = new StringBuilder();
@@ -107,6 +73,142 @@ abstract class Methods {
         return sb.toString();
     }
 
+    static byte[] decodeString(String b64) throws IOException {
+
+        final int len = b64.length();
+
+        if(len%4 != 0) {
+            throw new IOException("Input String is not a valid Base64 string.");
+        }
+        else {
+            final int padding = (b64.charAt(len - 1) == '=' ? 1 : 0) + (b64.charAt(len - 2) == '=' ? 1 : 0);
+            final int outLen = (len/4)*3 - padding;
+
+            final byte[] outBytes = new byte[outLen];
+
+            int i = 0;
+            int j = 0;
+            final byte[] cVal = new byte[4];
+
+            while(j <= outLen - 3) {
+
+                cVal[0] = charToValue(b64.charAt(i++));
+                cVal[1] = charToValue(b64.charAt(i++));
+                cVal[2] = charToValue(b64.charAt(i++));
+                cVal[3] = charToValue(b64.charAt(i++));
+
+                outBytes[j++] = (byte)((cVal[0] * 4) + (cVal[1] / 16));
+                outBytes[j++] = (byte)((cVal[1] * 16) + (cVal[2] / 4));
+                outBytes[j++] = (byte)((cVal[2] * 64) + cVal[3]);
+
+            }
+
+            switch (padding) {
+                case 0:
+                    break;
+                case 1:
+                    cVal[0] = charToValue(b64.charAt(i++));
+                    cVal[1] = charToValue(b64.charAt(i++));
+                    cVal[2] = charToValue(b64.charAt(i));
+
+                    outBytes[j++] = (byte) ((cVal[0] * 4) + (cVal[1] / 16));
+                    outBytes[j] = (byte)((cVal[1] * 16) + (cVal[2] / 4));
+                    break;
+                case 2:
+                    cVal[0] = charToValue(b64.charAt(i++));
+                    cVal[1] = charToValue(b64.charAt(i));
+
+                    outBytes[j] = (byte)((cVal[0] * 4) + (cVal[1] / 16));
+                    break;
+            }
+            return outBytes;
+        }
+    }
+
+    static byte[] decodeString_UrlEncoding(String b64) throws IOException {
+
+        StringBuilder sb = new StringBuilder();
+
+        int k = 0;
+
+        while(k < b64.length()) {
+            final char c = b64.charAt(k++);
+
+            if (c != '%') {
+                sb.append(c);
+            }
+            else {
+                final char c1 = b64.charAt(k++);
+                final char c2 = b64.charAt(k++);
+
+                switch (String.format("%c%c", c1, Character.toUpperCase(c2))) {
+                    case "2B":
+                        sb.append(encValues[62]);
+                        break;
+                    case "2F":
+                        sb.append(encValues[63]);
+                        break;
+                    case "3D":
+                        sb.append(encValues[64]);
+                        break;
+                    default:
+                        throw new IOException("Input String is not a valid Base64 string.");
+                }
+            }
+        }
+
+        String b64String = sb.toString();
+
+        final int len = b64String.length();
+
+        if(len%4 != 0) {
+            throw new IOException("Input String is not a valid Base64 string.");
+        }
+        else {
+            final char[] chs = b64String.toCharArray();
+            final int padding = (chs[len - 1] == '=' ? 1 : 0) + (chs[len - 2] == '=' ? 1 : 0);
+
+            final int outLen = (len/4)*3 - padding;
+
+            final byte[] outBytes = new byte[outLen];
+
+            int i = 0;
+            int j = 0;
+            final byte[] cVal = new byte[4];
+
+            while(j <= outLen - 3) {
+                cVal[0] = charToValue(chs[i++]);
+                cVal[1] = charToValue(chs[i++]);
+                cVal[2] = charToValue(chs[i++]);
+                cVal[3] = charToValue(chs[i++]);
+
+                outBytes[j++] = (byte)((cVal[0] * 4) + (cVal[1] / 16));
+                outBytes[j++] = (byte)((cVal[1] * 16) + (cVal[2] / 4));
+                outBytes[j++] = (byte)((cVal[2] * 64) + cVal[3]);
+            }
+
+            switch (padding) {
+                case 0:
+                    break;
+                case 1:
+                    cVal[0] = charToValue(chs[i++]);
+                    cVal[1] = charToValue(chs[i++]);
+                    cVal[2] = charToValue(chs[i]);
+
+                    outBytes[j++] = (byte) ((cVal[0] * 4) + (cVal[1] / 16));
+                    outBytes[j] = (byte)((cVal[1] * 16) + (cVal[2] / 4));
+                    break;
+                case 2:
+                    cVal[0] = charToValue(chs[i++]);
+                    cVal[1] = charToValue(chs[i]);
+
+                    outBytes[j] = (byte)((cVal[0] * 4) + (cVal[1] / 16));
+                    break;
+            }
+            return outBytes;
+        }
+    }
+
     static byte[] decodeBytes(byte[] bytes) throws IOException {
 
         final int len = bytes.length;
@@ -125,7 +227,7 @@ abstract class Methods {
             int j = 0;
             final byte[] cVal = new byte[4];
 
-            while(outLen - j >= 3) {
+            while(j <= outLen - 3) {
 
                 cVal[0] = charToValue(bytes[i++]);
                 cVal[1] = charToValue(bytes[i++]);
@@ -164,29 +266,27 @@ abstract class Methods {
 
         StringBuilder sb = new StringBuilder();
 
-        for (int k = 0; k < bytes.length; k++) {
+        int k = 0;
 
-            final byte c = bytes[k];
+        while(k < bytes.length) {
+            final byte c = bytes[k++];
 
-            if(c != '%') {
-                sb.append((char)c);
+            if (c != '%') {
+                sb.append((char) c);
             }
             else {
-                final byte c1 = bytes[k+1];
-                final byte c2 = bytes[k+2];
+                final byte c1 = bytes[k++];
+                final byte c2 = bytes[k++];
 
-                switch (String.format("%c%c",c1,c2).toUpperCase()) {
+                switch (String.format("%c%c", c1, Character.toUpperCase(c2))) {
                     case "2B":
-                        sb.append((char) encValues[62]);
-                        k+=2;
+                        sb.append(encValues[62]);
                         break;
                     case "2F":
-                        sb.append((char) encValues[63]);
-                        k+=2;
+                        sb.append(encValues[63]);
                         break;
                     case "3D":
-                        sb.append((char) encValues[64]);
-                        k+=2;
+                        sb.append(encValues[64]);
                         break;
                     default:
                         throw new IOException("Input String is not a valid Base64 string.");
@@ -213,7 +313,7 @@ abstract class Methods {
             int j = 0;
             final byte[] cVal = new byte[4];
 
-            while(outLen - j >= 3) {
+            while(j <= outLen - 3) {
                 cVal[0] = charToValue(chs[i++]);
                 cVal[1] = charToValue(chs[i++]);
                 cVal[2] = charToValue(chs[i++]);
@@ -247,7 +347,6 @@ abstract class Methods {
     }
 
     private static char valueToChar(int value) {
-
         return encValues[value];
     }
 
