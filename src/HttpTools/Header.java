@@ -1,6 +1,7 @@
 package HttpTools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,11 @@ public class Header {
         this.name = name;
         this.values = values;
 
+    }
+
+    public Header(String name, String[] values) {
+        this.name = name;
+        this.values = Arrays.asList(values);
     }
 
     public Header(String name, String value) {

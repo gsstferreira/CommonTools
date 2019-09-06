@@ -18,7 +18,7 @@ public class HttpResponseSecure extends HttpResponse {
 
     private boolean peerVerified;
 
-    HttpResponseSecure(List<Header> headers, int httpCode, String content, HttpsURLConnection connection) {
+    public HttpResponseSecure(List<Header> headers, int httpCode, String content, HttpsURLConnection connection) {
         super(headers,httpCode,content);
 
         if(connection != null) {

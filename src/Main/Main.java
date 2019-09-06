@@ -1,9 +1,11 @@
 package Main;
 
 import Base64Tools.Base64Tool;
+import HttpTools.*;
+import HttpTools.ServerResponse;
 
 import java.io.*;
-import java.util.Base64;
+import java.util.List;
 
 public class Main {
 
@@ -19,5 +21,14 @@ public class Main {
         String returnString = new String(Base64Tool.decodeString(b64,true));
 
         System.out.println(returnString);
+
+        HttpServer server = new HttpServer(20512, new ServerAction() {
+            @Override
+            public ServerResponse respond(String path, List<Header> headers, String method, String data) {
+                return new ServerResponse("200 OK",headers,data);
+            }
+        });
+
+        server.start();
     }
 }
