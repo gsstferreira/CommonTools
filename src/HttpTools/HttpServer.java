@@ -54,6 +54,10 @@ public class HttpServer {
                     }
                 }
             }
+            try {
+                serverSocket.close();
+            }
+            catch (Exception ignored) {}
         }).start();
     }
 
@@ -66,6 +70,10 @@ public class HttpServer {
             running = false;
             serverSocket.close();
         }
+    }
+
+    public void queryStop() {
+        running = false;
     }
 
     private void readSocket(Socket s) throws IOException {
@@ -111,13 +119,12 @@ public class HttpServer {
             }
 
             String data = sb.toString().trim();
-            System.out.println(data);
 
-            ServerResponse response = performedAction.respond(action, headers, method, data);
+            ServerResponse response = performedAction.respond(s,action, headers, method, data);
 
             outputWriter.write(String.format("HTTP/1.1 %s\n",response.getResponseMethod()));
 
-            for (Header h:headers) {
+            for (Header h:response.getResponseHeaders()) {
                 StringBuilder hb = new StringBuilder();
                 for (String v:h.getValues()) {
                     hb.append(v).append(',');
@@ -125,22 +132,23 @@ public class HttpServer {
                 hb.setLength(hb.length() - 1);
                 outputWriter.write(String.format("%s: %s\n",h.getName(),hb.toString()));
             }
-
             if(response.getResponseData() != null && response.getResponseData().length() > 0) {
-                outputWriter.write('\n');
+                byte[] dataBytes = response.getResponseData().getBytes();
+                outputWriter.write(String.format("Content-length: %d\n\n",dataBytes.length));
                 outputWriter.write(response.getResponseData() + '\n');
             }
 
             outputWriter.flush();
 
            try {
-               inputReader.close();
-               outputWriter.close();
                s.close();
            }
            catch (Exception e) {
                e.printStackTrace();
            }
+        }
+        else {
+            s.close();
         }
     }
 

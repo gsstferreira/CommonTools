@@ -2,9 +2,6 @@
   <artifact type="jar" name="HttpTool">
     <output-path>$PROJECT_DIR$/out/artifacts/HttpTool</output-path>
     <root id="archive" name="HttpTool.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
-      </element>
       <element id="directory" name="HttpTools">
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/Header.class" />
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/HttpClient.class" />
@@ -13,6 +10,10 @@
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/ServerResponse.class" />
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/ServerAction.class" />
         <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/HttpServer.class" />
+        <element id="file-copy" path="$PROJECT_DIR$/out/production/CommonTools/HttpTools/StatusCode.class" />
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/out/META-INF/MANIFEST.MF" />
       </element>
     </root>
   </artifact>
