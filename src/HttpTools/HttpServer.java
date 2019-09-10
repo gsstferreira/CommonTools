@@ -11,10 +11,16 @@ public class HttpServer {
 
     private final int serverPort;
     private final ServerAction performedAction;
-
     private ServerSocket serverSocket;
     private boolean running;
 
+    /**
+     Creates an instance of HttpServer, performing specified action and binding on specified port.
+     Port binding is not performed on constructor.
+     @param port Network port to listen to
+     @param action Interface method to define how the server will process requests and send responses.
+     @throws NullPointerException if action is null
+     */
     public HttpServer(int port, ServerAction action) throws NullPointerException {
         this.serverPort = port;
 
@@ -30,6 +36,10 @@ public class HttpServer {
         return serverPort;
     }
 
+    /**
+    Start the server, binding to port.
+    @throws IOException if network port is already bound, calling start() on an already running server (as port will be bound)
+    */
     public void start() throws IOException {
 
         serverSocket = new ServerSocket(serverPort);
@@ -61,6 +71,10 @@ public class HttpServer {
         }).start();
     }
 
+    /**
+    Stops a running server. Socket will be closed, preventing new requests, but ongoing ones will have responses sent properly.
+    @throws IOException if calling stop() on an already stopped/inactive server
+    */
     public void stop() throws IOException {
 
         if(!running) {
@@ -70,10 +84,6 @@ public class HttpServer {
             running = false;
             serverSocket.close();
         }
-    }
-
-    public void queryStop() {
-        running = false;
     }
 
     private void readSocket(Socket s) throws IOException {
@@ -122,7 +132,7 @@ public class HttpServer {
 
             ServerResponse response = performedAction.respond(s,action, headers, method, data);
 
-            outputWriter.write(String.format("HTTP/1.1 %s\n",response.getResponseMethod()));
+            outputWriter.write(String.format("HTTP/1.1 %s\n",response.getResponseCode()));
 
             for (Header h:response.getResponseHeaders()) {
                 StringBuilder hb = new StringBuilder();
@@ -132,10 +142,10 @@ public class HttpServer {
                 hb.setLength(hb.length() - 1);
                 outputWriter.write(String.format("%s: %s\n",h.getName(),hb.toString()));
             }
-            if(response.getResponseData() != null && response.getResponseData().length() > 0) {
-                byte[] dataBytes = response.getResponseData().getBytes();
+            if(response.getResponseBody() != null && response.getResponseBody().length() > 0) {
+                byte[] dataBytes = response.getResponseBody().getBytes();
                 outputWriter.write(String.format("Content-length: %d\n\n",dataBytes.length));
-                outputWriter.write(response.getResponseData() + '\n');
+                outputWriter.write(response.getResponseBody() + '\n');
             }
 
             outputWriter.flush();

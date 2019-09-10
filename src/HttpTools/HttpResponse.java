@@ -33,4 +33,8 @@ public class HttpResponse {
         return new String(content);
     }
 
+    public boolean isSuccessful() {
+        return (responseCode >= 200) && (responseCode < 300);
+    }
+
 }
