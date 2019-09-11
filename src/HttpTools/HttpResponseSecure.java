@@ -9,17 +9,21 @@ import java.util.List;
 
 public class HttpResponseSecure extends HttpResponse {
 
-    private HostnameVerifier hostnameVerifier;
-    private Certificate[] localCertificates;
-    private Certificate[] serverCertificates;
-    private String cipherSuite;
-    private Principal localPrincipal;
-    private Principal peerPrincipal;
+    private final HostnameVerifier hostnameVerifier;
+    private final Certificate[] localCertificates;
+    private final Certificate[] serverCertificates;
+    private final String cipherSuite;
+    private final Principal localPrincipal;
+    private final Principal peerPrincipal;
 
-    private boolean peerVerified;
+    private final boolean peerVerified;
 
     public HttpResponseSecure(List<Header> headers, int httpCode, String content, HttpsURLConnection connection) {
         super(headers,httpCode,content);
+
+        Principal peerPrincipal1;
+        Certificate[] serverCertificates1;
+        boolean peerVerified1;
 
         if(connection != null) {
             hostnameVerifier = connection.getHostnameVerifier();
@@ -28,26 +32,29 @@ public class HttpResponseSecure extends HttpResponse {
             localPrincipal = connection.getLocalPrincipal();
 
             try {
-                serverCertificates = connection.getServerCertificates();
-                peerPrincipal = connection.getPeerPrincipal();
-                peerVerified = true;
+                serverCertificates1 = connection.getServerCertificates();
+                peerPrincipal1 = connection.getPeerPrincipal();
+                peerVerified1 = true;
             }
             catch (SSLPeerUnverifiedException e) {
-                peerVerified = false;
-                serverCertificates = null;
-                peerPrincipal = null;
+                peerVerified1 = false;
+                serverCertificates1 = null;
+                peerPrincipal1 = null;
             }
         }
         else {
             hostnameVerifier = null;
             localCertificates = null;
-            serverCertificates = null;
+            serverCertificates1 = null;
             cipherSuite = null;
             localPrincipal = null;
-            peerPrincipal = null;
-            peerVerified = false;
+            peerPrincipal1 = null;
+            peerVerified1 = false;
         }
 
+        peerPrincipal = peerPrincipal1;
+        serverCertificates = serverCertificates1;
+        peerVerified = peerVerified1;
     }
 
     public static HttpResponseSecure makeResponseError(String message) {

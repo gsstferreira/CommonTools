@@ -11,8 +11,9 @@ public class HttpServer {
 
     private final int serverPort;
     private final ServerAction performedAction;
-    private ServerSocket serverSocket;
+
     private boolean running;
+    private ServerSocket serverSocket;
 
     /**
      Creates an instance of HttpServer, performing specified action and binding on specified port.

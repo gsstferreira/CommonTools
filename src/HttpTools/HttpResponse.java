@@ -1,7 +1,5 @@
 package HttpTools;
 
-import HttpTools.Header;
-
 import java.util.List;
 
 public class HttpResponse {
