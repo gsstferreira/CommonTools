@@ -1,7 +1,6 @@
 package Base64Tools;
 
 import java.io.IOException;
-
 import static AssertTools.Assert.*;
 
 abstract class Methods {
