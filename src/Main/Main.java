@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 public class Main {
 
@@ -27,8 +28,42 @@ public class Main {
 
         HttpServer server = new HttpServer(8080, new ServerAction() {
             @Override
-            public ServerResponse respond(Socket socket, String path, List<Header> headers, String method, String data) {
-                return new ServerResponse(StatusCode.NO_CONTENT,stdHeaders());
+            public AuthResult authorize(Socket socket, String path, List<Header> headers, String method) {
+                return AuthResult.AUTHORIZED;
+            }
+
+            @Override
+            public ServerResponse respondGET(String path, List<Header> headers) {
+                switch (path) {
+                    case "/foo":
+                        return new ServerResponse(StatusCode.OK,null,"bar");
+                    case "/marco":
+                        return new ServerResponse(StatusCode.OK,null,"polo");
+                    case "/random":
+                        return new ServerResponse(StatusCode.OK,null,Integer.toString(new Random().nextInt()));
+                    default:
+                        return new ServerResponse(StatusCode.NOT_FOUND);
+                }
+            }
+
+            @Override
+            public ServerResponse respondPOST(String path, List<Header> headers, String data) {
+                return new ServerResponse(StatusCode.NOT_FOUND);
+            }
+
+            @Override
+            public ServerResponse respondPUT(String path, List<Header> headers, String data) {
+                return new ServerResponse(StatusCode.NOT_FOUND);
+            }
+
+            @Override
+            public ServerResponse respondDELETE(String path, List<Header> headers) {
+                return new ServerResponse(StatusCode.NOT_FOUND);
+            }
+
+            @Override
+            public ServerResponse respondCustom(String path, List<Header> headers, String method, String data) {
+                return new ServerResponse(StatusCode.NOT_FOUND);
             }
         });
 

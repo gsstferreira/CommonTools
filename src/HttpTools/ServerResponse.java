@@ -19,7 +19,7 @@ public class ServerResponse {
     public ServerResponse(StatusCode statusCode, List<Header> headers, String body) {
         this.responseCode = statusCode.getCodeDescr();
         this.responseBody = body;
-        this.responseHeaders = headers;
+        this.responseHeaders = headers == null ? stdHeaders() : headers;
     }
 
     /**
@@ -32,7 +32,7 @@ public class ServerResponse {
     public ServerResponse(StatusCode statusCode, List<Header> headers) {
         if(statusCode != StatusCode.OK) {
             this.responseCode = statusCode.getCodeDescr();
-            this.responseHeaders = headers;
+            this.responseHeaders = headers == null ? stdHeaders() : headers;
             this.responseBody = statusCode.getDefaultMessage();
         }
         else {
@@ -49,12 +49,8 @@ public class ServerResponse {
     public ServerResponse(StatusCode statusCode) {
         if(statusCode != StatusCode.OK) {
 
-            List<Header> headers = new ArrayList<>();
-            headers.add(new Header("Date",new Date().toString()));
-            headers.add(new Header("Content-Type","text/plain"));
-
             this.responseCode = statusCode.getCodeDescr();
-            this.responseHeaders = headers;
+            this.responseHeaders = stdHeaders();
             this.responseBody = statusCode.getDefaultMessage();
         }
         else {
@@ -62,6 +58,35 @@ public class ServerResponse {
         }
     }
 
+    /**
+     Creates a new instance of ServerResponse from HttpResponse, extracting response code, heaqders and content.
+     @param response HTTP response
+     */
+    public ServerResponse(HttpResponse response) {
+
+        String code = null;
+
+        for (StatusCode sc:StatusCode.values()) {
+            if(sc.getCodeNumber() == response.getResponseCode()) {
+                code = sc.getCodeDescr();
+                break;
+            }
+        }
+
+        List<Header> hs = response.getHeaders();
+
+        this.responseHeaders = hs == null ? stdHeaders() : hs;
+
+        if(code == null) {
+            this.responseCode = StatusCode.BAD_GATEWAY.getCodeDescr();
+            this.responseBody = StatusCode.BAD_GATEWAY.getDefaultMessage();
+        }
+        else {
+            this.responseCode = code;
+            this.responseBody = response.getContentAsString();
+        }
+    }
+    
 
     /**
      Returns response code and description as String.
@@ -82,5 +107,13 @@ public class ServerResponse {
      */
     public String getResponseBody() {
         return responseBody;
+    }
+
+    private List<Header> stdHeaders() {
+        List<Header> headers = new ArrayList<>();
+        headers.add(new Header("Date",new Date().toString()));
+        headers.add(new Header("Content-Type","text/plain"));
+
+        return headers;
     }
 }

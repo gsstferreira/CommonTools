@@ -97,7 +97,7 @@ public class HttpServer {
         if(firstLine != null) {
             StringTokenizer tokenizer = new StringTokenizer(firstLine);
 
-            String method = tokenizer.nextToken();
+            String method = tokenizer.nextToken().toUpperCase();
             String action = tokenizer.nextToken();
 
             List<Header> headers = new ArrayList<>();
@@ -130,8 +130,38 @@ public class HttpServer {
             }
 
             String data = sb.toString().trim();
+            ServerResponse response;
 
-            ServerResponse response = performedAction.respond(s,action, headers, method, data);
+            switch (performedAction.authorize(s,action,headers,method)) {
+                case UNAUTHORIZED:
+                    response = new ServerResponse(StatusCode.UNAUTHORIZED);
+                    break;
+                case FORBIDDEN:
+                    response = new ServerResponse(StatusCode.FORBIDDEN);
+                    break;
+                case AUTHORIZED:
+                    switch (method) {
+                        case "GET":
+                            response = performedAction.respondGET(action,headers);
+                            break;
+                        case "POST":
+                            response = performedAction.respondPOST(action,headers,data);
+                            break;
+                        case "PUT":
+                            response = performedAction.respondPUT(action,headers,data);
+                            break;
+                        case "DELETE":
+                            response = performedAction.respondDELETE(action,headers);
+                            break;
+                        default:
+                            response = performedAction.respondCustom(action,headers,method,data);
+                            break;
+                    }
+                    break;
+                default:
+                    response = new ServerResponse(StatusCode.INTERNAL_SERVER_ERROR);
+                    break;
+            }
 
             outputWriter.write(String.format("HTTP/1.1 %s\n",response.getResponseCode()));
 
@@ -148,19 +178,17 @@ public class HttpServer {
                 outputWriter.write(String.format("Content-length: %d\n\n",dataBytes.length));
                 outputWriter.write(response.getResponseBody() + '\n');
             }
-
             outputWriter.flush();
 
-           try {
-               s.close();
-           }
-           catch (Exception e) {
-               e.printStackTrace();
-           }
+            try {
+                s.close();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         else {
             s.close();
         }
     }
-
 }
